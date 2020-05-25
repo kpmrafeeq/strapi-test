@@ -1,27 +1,45 @@
-version: '3'
+version: "3"
+
 services:
-  strapi:
+  strapiexample:
     image: strapi/strapi
+    container_name: strapiexample
+    restart: unless-stopped
+    env_file: .env
     environment:
-      DATABASE_CLIENT: mongo
-      DATABASE_NAME: strapi
-      DATABASE_HOST: mongo
-      DATABASE_PORT: 27017
-      DATABASE_USERNAME: strapi
-      DATABASE_PASSWORD: strapi
-    links:
-      - mongo:mongo
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    #    links:
+    #      - mongo:mongo
+    networks:
+      - strapi-app-network
     volumes:
       - ./app:/srv/app
     ports:
-      - '1337:1337'
+      - "1337:1337"
 
-  mongo:
+  mongoexample:
     image: mongo
+    container_name: mongoexample
+    restart: unless-stopped
+    env_file: .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: strapi
-      MONGO_INITDB_ROOT_PASSWORD: strapi
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - strapi-app-network
     volumes:
-      - ./data/db:/data/db
+      - strapidata:/data/db
     ports:
-      - '27017:27017'
+      - "27017:27017"
+
+networks:
+  strapi-app-network:
+    driver: bridge
+
+volumes:
+  strapidata:
